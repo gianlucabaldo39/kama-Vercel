@@ -145,7 +145,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .note-preview{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* TIMELINE */
-.tl-outer{overflow-x:scroll;padding-bottom:10px;}
+.tl-outer{overflow-x:scroll;padding-bottom:10px;min-height:200px;}
 .tl-outer::-webkit-scrollbar{height:7px;}
 .tl-outer::-webkit-scrollbar-track{background:var(--surface2);border-radius:99px;}
 .tl-outer::-webkit-scrollbar-thumb{background:var(--kama);border-radius:99px;}
@@ -267,7 +267,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="tab" data-t="gestione" onclick="showTab('gestione')">⚙️ Gestione</button>
     </div>
     <div class="nav-right">
-      <div id="gs-status"><div id="gs-dot"></div><span id="gs-label">...</span></div>
+      <div id="gs-status" style="cursor:pointer" onclick="window.open('https://docs.google.com/spreadsheets/d/1nTcJvgwQtz1szB053SPilqAmiS4uEhYXLJ2gHbf21Dc/edit','_blank')" title="Apri foglio Google"><div id="gs-dot"></div><span id="gs-label">...</span><span style="font-size:10px;opacity:.5;margin-left:2px">↗</span></div>
       <button class="back-btn" onclick="backToHero()">← Indietro</button>
     </div>
   </div>
@@ -507,7 +507,7 @@ function buildOverview(){
   ctx.clearRect(0,0,150,150);
   const slices=[];
   data.forEach((v,i)=>{const angle=(v/total)*Math.PI*2;ctx.beginPath();ctx.moveTo(75,75);ctx.arc(75,75,60,st,st+angle);ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();slices.push({start:st,end:st+angle,i});st+=angle;});
-  ctx.beginPath();ctx.arc(75,75,36,0,Math.PI*2);ctx.fillStyle='var(--surface)';ctx.fill();
+  ctx.beginPath();ctx.arc(75,75,36,0,Math.PI*2);ctx.fillStyle='#0F1210';ctx.fill();
   ctx.fillStyle='var(--text)';ctx.font='bold 16px Barlow Condensed,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(total,75,75);
   cv.onclick=(e)=>{
     const rect=cv.getBoundingClientRect();const x=e.clientX-rect.left-75,y=e.clientY-rect.top-75;
@@ -618,9 +618,10 @@ function buildTimeline(){
     ci.forEach(r=>{
       const p=r.d.split('/');if(p.length<3)return;
       const pc=pct(+p[2],+p[1]);const color=MCOLOR[r.m]||'#aaa';
+      const gg=daysTo(r.d);const urgent=gg!==null&&gg<=90;
       const seg=document.createElement('div');seg.className='tl-seg';
-      seg.style.cssText='left:calc('+pc+'% - 20px);width:42px;background:'+color+';color:#08090A;font-size:9px;font-weight:700;';
-      seg.title=q+' · '+r.m+' · '+(r.s||'–')+' · '+r.d;seg.textContent=r.m.substring(0,3);
+      seg.style.cssText='left:calc('+pc+'% - 20px);width:42px;background:'+color+';color:#08090A;font-size:9px;font-weight:700;'+(urgent?'box-shadow:0 0 8px '+color+';outline:2px solid white;outline-offset:-2px;':'');
+      seg.title=q+' · '+r.m+' · '+(r.s||'–')+' · '+r.d+(gg!==null?' ('+gg+' gg)':'');seg.textContent=r.m.substring(0,3);
       seg.onclick=()=>openClubModal(q);ba.appendChild(seg);
     });
     row.appendChild(lbl);row.appendChild(ba);grid.appendChild(row);
